@@ -6,13 +6,13 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import HomePage from "./components/HomePage";
 import Footer from "./components/Footer";
+import Document from "./components/Document";
 import Nav from "./components/Nav";
 import NotFound from "./components/NotFound";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useGlobalContext } from "./context";
 
 function App() {
-
   const { showModal, favorites } = useGlobalContext();
   return (
     <div>
@@ -32,6 +32,7 @@ function App() {
               </div>
             }
           ></Route>
+          <Route path="/doc/:docId" element={<Document />}></Route>
           <Route path="*" element={<NotFound />}></Route>
         </Routes>
         <Footer />

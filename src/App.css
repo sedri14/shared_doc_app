@@ -21,6 +21,7 @@ html {
   --primary-700: #02367d;
   --primary-800: #01214b;
   --primary-900: #000b19;
+  --color-brand: #0f21c9;
 
   /* grey */
   --grey-50: #f8fafc;
@@ -40,6 +41,7 @@ html {
   --red-dark: #842029;
   --green-light: #d1e7dd;
   --green-dark: #0f5132;
+  --color-brand-rgb: 15, 33, 201;
 
   /* fonts  */
   --small-text: 0.875rem;
@@ -62,6 +64,15 @@ html {
     0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-4: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /*border*/
+  --border-radius-md: 6px;
+
+  /*rem*/
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 2rem;
+  --space-4: 4rem;
 }
 
 body {
@@ -363,4 +374,111 @@ ul {
 .close-btn {
   background: var(--red-dark);
   color: var(--white);
+}
+
+/*SharedDoc app*/
+
+/* .single-node {
+  background: var(--white);
+  color: var(--textColor);
+  border-radius: var(--borderRadius);
+  box-shadow: var(--shadow-2);
+  transition: var(--transition);
+}
+
+.single-node:hover {
+  box-shadow: var(--shadow-4);
+} */
+
+.inodes {
+  display: grid;
+  grid-auto-rows: auto;
+  grid-auto-columns: -webkit-max-content;
+  grid-auto-columns: max-content;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  grid-column-gap: var(--space-2);
+  grid-row-gap: var(--space-2);
+  text-align: center;
+}
+
+.inodes .item {
+  outline: none;
+}
+
+.inodes .item .icon {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border: 2px solid transparent;
+  font-size: 1.6em;
+}
+
+.inodes .item .icon,
+.inodes .item:hover .icon {
+  background: var(--white);
+}
+
+.inodes .item:focus .icon {
+  border-color: rgba(var(--color-brand-rgb), 0.5);
+  background: rgba(var(--color-brand-rgb), 0.05);
+}
+
+.inodes .item:focus .inode-name {
+  color: var(--color-brand);
+}
+
+.icons .inode-name {
+  margin-top: 0.5rem;
+  font-size: 0.7em;
+  overflow: hidden;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+/*Document*/
+
+.document {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+.document header {
+  background-color: #f1f1f1;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.document h1 {
+  font-size: 48px;
+  margin: 0;
+}
+
+.document p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.document main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+}
+
+.document textarea {
+  width: 80%;
+  height: 80%;
+  font-size: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  resize: none;
+  background-color: #f9f9f9;
+  outline: none;
 }
