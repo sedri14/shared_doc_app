@@ -6,6 +6,8 @@ const AppContext = React.createContext();
 const allMealsUrl = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
 const randomMealUrl = "https://www.themealdb.com/api/json/v1/1/random.php";
 const getChildrenURL = "fs/level/";
+const getRootDirURL = "fs/root/";
+const getSharedWithMeURL = "fs/shared-with-me";
 
 const AppProvider = ({ children }) => {
   //Meals app
@@ -19,10 +21,12 @@ const AppProvider = ({ children }) => {
   );
 
   //SharedDoc app
+  const [rootDirId, setRootDirId] = useState(null);
   const [currentDocId, setCurrentDocId] = useState(null);
   const [document, setDocument] = useState(null);
   const [inodes, setINodes] = useState([]);
   const [selectedINode, setSelectedINode] = useState(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [isLoggedin, setIsLoggedin] = useState(
     localStorage.getItem("token") !== null
   );
@@ -59,6 +63,67 @@ const AppProvider = ({ children }) => {
       });
   };
 
+  const getRootDir = () => {
+    console.log("Getting root directory");
+    console.log("Seding a get request to:" + SERVER_ADDRESS + getRootDirURL);
+    fetch(SERVER_ADDRESS + getRootDirURL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("token"),
+      },
+    })
+      .then((response) => {
+        console.log("status" + response.status);
+        return Promise.all([response.status, response.json()]);
+      })
+      .then(([status, body]) => {
+        if (status == 200) {
+          if (body) {
+            setINodes(body);
+          } else {
+            setINodes([]);
+          }
+        } else {
+          alert(body.message);
+        }
+      })
+      .catch((error) => {
+        console.error(`ERROR: ${error}`);
+      });
+  };
+
+  const getSharedWithMe = () => {
+    console.log("Getting shared files");
+    console.log(
+      "Seding a get request to:" + SERVER_ADDRESS + getSharedWithMeURL
+    );
+    fetch(SERVER_ADDRESS + getSharedWithMeURL, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token: localStorage.getItem("token"),
+      },
+    })
+      .then((response) => {
+        console.log("status" + response.status);
+        return Promise.all([response.status, response.json()]);
+      })
+      .then(([status, body]) => {
+        if (status == 200) {
+          if (body) {
+            setINodes(body);
+          } else {
+            setINodes([]);
+          }
+        } else {
+          alert(body.message);
+        }
+      })
+      .catch((error) => {
+        console.error(`ERROR: ${error}`);
+      });
+  };
 
   const fetchMeals = (allMealsUrl) => {
     setLoading(true);
@@ -139,6 +204,7 @@ const AppProvider = ({ children }) => {
         addToFavorites,
         removeFromFavorites,
         isLoggedin,
+        setIsLoggedin,
         getChildren,
         inodes,
         selectedINode,
@@ -146,6 +212,10 @@ const AppProvider = ({ children }) => {
         currentDocId,
         setCurrentDocId,
         document,
+        getRootDir,
+        getSharedWithMe,
+        currentUserEmail,
+        setCurrentUserEmail
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Form, Row, Col, Container, Button } from "react-bootstrap";
 import { SERVER_ADDRESS as SERVER_ADDRESS } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { useGlobalContext } from "../context";
 
 const userLoginURL = "auth/login";
 
@@ -12,6 +13,7 @@ const Login = () => {
     password: "",
   });
 
+  const { setIsLoggedin, setCurrentUserEmail } = useGlobalContext();
   const [passWordShown, setPasswordShown] = useState(false);
 
   const navigate = useNavigate();
@@ -38,6 +40,8 @@ const Login = () => {
       .then(([status, body]) => {
         if (status == 200) {
           localStorage.setItem("token", body.token);
+          setIsLoggedin(true);
+          localStorage.setItem("email", body.email);
           navigate("/");
         } else {
           alert(body.message);

@@ -5,19 +5,18 @@ import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
 import { SERVER_ADDRESS } from "../constants";
 
-const docLoadURL = "doc/";
+const docLoadURL = "/doc";
 
-const HomePage = () => {
+const SharedWithMe = () => {
   const {
     isLoggedin,
-    getChildren,
     inodes,
     selectedINode,
     setSelectedINode,
     currentDocId,
     setCurrentDocId,
     loadDocument,
-    getRootDir
+    getSharedWithMe,
   } = useGlobalContext();
 
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ const HomePage = () => {
 
   useEffect(() => {
     if (isLoggedin) {
-      getRootDir();
+      getSharedWithMe();
     }
   }, [isLoggedin]);
 
@@ -50,9 +49,9 @@ const HomePage = () => {
       //console.log(inode);
       setSelectedINode(inode);
       if (inode.type === "FILE") {
-        //TODO: replace url to doc/:docId by cnhanging the currentDocId.
         setCurrentDocId(inode.id);
-        navigate(docLoadURL + `${inode.id}`);
+        console.log("navigating to: " + docLoadURL + `${inode.id}`);
+        navigate(docLoadURL + `/${inode.id}`);
       } else {
         //open dir
       }
@@ -68,7 +67,7 @@ const HomePage = () => {
         </h5>
         <h5>User connected</h5>
 
-        <h1>Your Drive</h1>
+        <h1>Shared With You</h1>
         <section className="inodes">
           {inodes.map((inode) => {
             const { id, name, creationDate, lastEdited, type, content } = inode;
@@ -117,4 +116,4 @@ const HomePage = () => {
   }
 };
 
-export default HomePage;
+export default SharedWithMe;

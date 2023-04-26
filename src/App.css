@@ -211,7 +211,7 @@ ul {
 
 /*Favorites*/
 .favorites {
-  background: var(--black);
+  background: var(--grey-500);
   color: var(--white);
   padding: 1rem 0;
 }
@@ -232,25 +232,20 @@ ul {
   text-align: center;
 }
 
-.favorite-img {
-  width: 60px;
+.favorites-img {
+  width: 55px;
   border-radius: 50%;
   border: 5px solid var(--white);
-  cursor: pointer;
 }
 
-.remove-btn {
+.connected-user {
   margin-top: 0.25rem;
   background: transparent;
   color: var(--white);
   border: transparent;
   cursor: pointer;
-  font-size: 0.5rem;
+  font-size: 0.8rem;
   transition: var(--transition);
-}
-
-.remove-btn:hover {
-  color: var(--red-dark);
 }
 
 /*Meals*/
