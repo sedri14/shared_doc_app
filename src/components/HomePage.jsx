@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useGlobalContext } from "../context";
 import { CiFolderOn, CiFileOn } from "react-icons/ci";
 import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
+import AddInodeForm from "./AddInodeForm";
 import { SERVER_ADDRESS } from "../constants";
 
 const docLoadURL = "doc/";
@@ -17,7 +19,6 @@ const HomePage = () => {
     currentDocId,
     setCurrentDocId,
     loadDocument,
-    getRootDir
   } = useGlobalContext();
 
   const navigate = useNavigate();
@@ -32,9 +33,13 @@ const HomePage = () => {
 
   useEffect(() => {
     if (isLoggedin) {
-      getRootDir();
+      getChildren(localStorage.getItem("rootId"));
     }
   }, [isLoggedin]);
+
+  useEffect(() => {
+
+  }, [inodes]);
 
   const handleDbClickINode = (event, idNode) => {
     if (event.detail === 2) {
@@ -61,46 +66,59 @@ const HomePage = () => {
 
   if (isLoggedin) {
     return (
-      <section className="section">
-        <h5>
-          Selected inode:
-          {selectedINode !== null ? selectedINode.name : "not selected"}
-        </h5>
-        <h5>User connected</h5>
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            <section className="section">
+              <h5>
+                Selected inode:
+                {selectedINode !== null ? selectedINode.name : "not selected"}
+              </h5>
+              <h5>User connected</h5>
 
-        <h1>Your Drive</h1>
-        <section className="inodes">
-          {inodes.map((inode) => {
-            const { id, name, creationDate, lastEdited, type, content } = inode;
-            return (
-              <div key={id} className="item">
-                <div
-                  className="icon"
-                  onClick={(event) => {
-                    handleDbClickINode(event, id);
-                  }}
-                >
-                  {type === "DIR" ? (
-                    <IconContext.Provider
-                      value={{ className: "shared-class", size: 70 }}
-                    >
-                      <CiFolderOn />
-                    </IconContext.Provider>
-                  ) : (
-                    <IconContext.Provider
-                      value={{ className: "shared-class", size: 70 }}
-                    >
-                      <CiFileOn />
-                    </IconContext.Provider>
-                  )}
-                </div>
+              <h1>Your Drive</h1>
+              <section className="inodes">
+                {inodes.map((inode) => {
+                  const { id, name, creationDate, type } = inode;
+                  return (
+                    <div key={id} className="item">
+                      <div
+                        className="icon"
+                        onClick={(event) => {
+                          handleDbClickINode(event, id);
+                        }}
+                      >
+                        {type === "DIR" ? (
+                          <IconContext.Provider
+                            value={{ className: "shared-class", size: 70 }}
+                          >
+                            <CiFolderOn />
+                          </IconContext.Provider>
+                        ) : (
+                          <IconContext.Provider
+                            value={{ className: "shared-class", size: 70 }}
+                          >
+                            <CiFileOn />
+                          </IconContext.Provider>
+                        )}
+                      </div>
 
-                <div className="inode-name">{name}</div>
+                      <div className="inode-name">{name}</div>
+                    </div>
+                  );
+                })}
+              </section>
+            </section>
+          </div>
+          <div className="col">
+            <section>
+              <div style={{ border: "1px solid black", padding: "10px" }}>
+                <AddInodeForm />
               </div>
-            );
-          })}
-        </section>
-      </section>
+            </section>
+          </div>
+        </div>
+      </div>
     );
   } else {
     return (

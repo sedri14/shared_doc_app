@@ -13,6 +13,18 @@ const Document = () => {
   const [stompClient, setStompClient] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const { currentUserEmail } = useGlobalContext();
+  const [content, setContent] = useState([]);
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const [rawText, setRawText] = useState([]);
+  const [prevCursorPosition, setPrevCursorPosition] = useState(0);
+
+  useEffect(() => {
+    if (null !== document) {
+      console.log("Document details:", document);
+      console.log(document.rawText);
+      setRawText(document.rawText);
+    }
+  }, [document]);
 
   useEffect(() => {
     console.log(onlineUsers);
@@ -35,12 +47,14 @@ const Document = () => {
   useEffect(() => {
     if (stompClient) {
       const onConnected = () => {
-        console.log("Subscribing to topic /topic/usersJoin/" + docId);
+        console.log("Subscribing to topics usersJoin and usersDiscommect of doc " + docId);
         stompClient.subscribe(`/topic/usersJoin/${docId}`, onJoinEventReceived);
         stompClient.subscribe(
           `/topic/usersDisconnect/${docId}`,
           onDisconnectEventReceived
         );
+        console.log(`connecting to socket room /topic/updates/${docId}`);
+        stompClient.subscribe(`/topic/updates/${docId}`, onUpdateEventReceived);
         userJoin();
       };
 
@@ -56,14 +70,12 @@ const Document = () => {
         setOnlineUsers(message);
       };
 
-      const sendMessage = (message) => {
-        if (stompClient.connected) {
-          stompClient.send(`/app/update/${docId}`, {}, JSON.stringify(message));
-        } else {
-          console.log(
-            "WebSocket connection is not established yet. Message not sent."
-          );
-        }
+      const onUpdateEventReceived = (event) => {
+        console.log("NEW TEXT UPDATE RECIEVED");
+        const updatedRawText = JSON.parse(event.body);
+        console.log("WHAT RETURNED FROM SOCKET: ", updatedRawText);
+        setRawText(updatedRawText);
+        setCursorPosition(prevCursorPosition + 1);
       };
 
       const userJoin = () => {
@@ -107,6 +119,16 @@ const Document = () => {
     }
   }, [stompClient, docId]);
 
+  const sendMessage = (message) => {
+    if (stompClient.connected) {
+      stompClient.send(`/app/update/${docId}`, {}, JSON.stringify(message));
+    } else {
+      console.log(
+        "WebSocket connection is not established yet. Message not sent."
+      );
+    }
+  };
+
   const loadDocument = (idNode) => {
     console.log("loading document..." + idNode);
     console.log("Seding a get request to:" + SERVER_ADDRESS + "doc/" + idNode);
@@ -124,8 +146,8 @@ const Document = () => {
       .then(([status, body]) => {
         if (status == 200) {
           console.log(body);
-          setDocument(body.data);
-          console.log(document);
+          setDocument(body);
+          setRawText(body.rawText)
         } else {
           alert(body.message);
         }
@@ -135,11 +157,62 @@ const Document = () => {
       });
   };
 
-  // const [content, setContent] = useState(document.content);
+  const convertRawTextToReadableText = () => {
+    console.log("converting raw text to readable content");
+    setContent(rawText.map((charItem) => charItem.val));
+  };
 
-  // const handleContentChange = (event) => {
-  //   setContent(event.target.value);
-  // };
+  useEffect(() => {
+    console.log("current raw text:", rawText);
+    console.log("$$$$$$$$$$$$$", rawText);
+    convertRawTextToReadableText();
+  }, [rawText]);
+
+  useEffect(() => {
+    console.log("%%%%%CURRENT DOC CONTENT%%%%%", content);
+  }, [content]);
+
+  const handleContentChange = (event) => {
+    const newChar = event.nativeEvent.data;
+    console.log("Char insertion: " + newChar);
+
+    const next = event.target.selectionStart - 1;
+    console.log("current position:" + next);
+    const prev =
+      next - 1 >= 0 ? next - 1 : null;
+    console.log("prev position:", prev);
+
+    //const nextPosition = currentPosition + 1;
+    //console.log("next position:", nextPosition);
+
+    console.log(rawText);
+
+    const message = {
+      p: rawText.length === 0 ? [] : rawText[prev].pos,
+      q: rawText.length === 0 || next >= rawText.length ? [] : rawText[next].pos,
+      ch: newChar,
+      email: localStorage.getItem("email")
+    };
+
+    console.log("Message To Socket:", message);
+    setPrevCursorPosition(prev);
+    console.log(prev);
+    sendMessage(message);
+  };
+
+  const handleMouseMove = (event) => {
+    const textarea = event.target;
+    const { selectionStart } = textarea;
+
+    setCursorPosition(selectionStart);
+  };
+
+  const handleKeyUp = (event) => {
+    const textarea = event.target;
+    const { selectionStart } = textarea;
+
+    setCursorPosition(selectionStart);
+  };
 
   return (
     <main className="container">
@@ -163,10 +236,13 @@ const Document = () => {
               </header>
               <main>
                 <textarea
-                  value={document.content}
-                  //onChange={handleContentChange}
+                  value={content.join("")}
+                  onChange={handleContentChange}
+                  onMouseMove={handleMouseMove}
+                  onKeyUp={handleKeyUp}
                 />
               </main>
+              <p>Cursor Position: {cursorPosition}</p>
             </div>
           </div>
         </div>

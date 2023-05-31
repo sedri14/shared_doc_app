@@ -42,9 +42,10 @@ const Login = () => {
           localStorage.setItem("token", body.token);
           setIsLoggedin(true);
           localStorage.setItem("email", body.email);
+          localStorage.setItem("rootId", body.rootId);
           navigate("/");
         } else {
-          alert(body.message);
+          console.log(body.message);
         }
       })
       .catch((error) => {
