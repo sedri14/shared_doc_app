@@ -5,6 +5,9 @@ import { CiFolderOn, CiFileOn } from "react-icons/ci";
 import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
 import AddInodeForm from "./AddInodeForm";
+import { Dropdown, Menu, Modal, Button } from "antd";
+import { DeleteOutlined } from "@ant-design/icons/lib/icons";
+import DeleteModal from "./DeleteModal";
 import { SERVER_ADDRESS } from "../constants";
 
 const docLoadURL = "doc/";
@@ -21,6 +24,44 @@ const HomePage = () => {
     loadDocument,
   } = useGlobalContext();
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedInodeId, setSelectedInodeId] = useState(null);
+  const [selectedInodeType, setSelectedInodeType] = useState("");
+  const [selectedInodeName, setSelectedInodeName] = useState("");
+
+  const showModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  useEffect(() => {
+   console.log("show modal changed boolean");
+  }, [isDeleteModalOpen]);
+
+  const menu = (id, type, name) => (
+    <Menu
+      onClick={({ key }) => handleMenuClick(key, type, id, name)}
+      items={[
+        {
+          label: "Delete",
+          key: "delete",
+          icon: <DeleteOutlined />,
+          danger: true,
+        },
+      ]}
+    ></Menu>
+  );
+
+  const handleMenuClick = (key, type, id, name) => {
+    console.log(`You clicked ${key} for ${type} ${name}, id: ${id}`);
+    if (key === "delete") {
+      setSelectedInodeId(id);
+      setSelectedInodeType(type);
+      setSelectedInodeName(name);
+      //open confirmation delete modal
+      showModal();
+    }
+  };
+
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -34,12 +75,11 @@ const HomePage = () => {
   useEffect(() => {
     if (isLoggedin) {
       getChildren(localStorage.getItem("rootId"));
+      //say hello user!
     }
   }, [isLoggedin]);
 
-  useEffect(() => {
-
-  }, [inodes]);
+  useEffect(() => {}, [inodes]);
 
   const handleDbClickINode = (event, idNode) => {
     if (event.detail === 2) {
@@ -80,39 +120,64 @@ const HomePage = () => {
               <section className="inodes">
                 {inodes.map((inode) => {
                   const { id, name, creationDate, type } = inode;
-                  return (
-                    <div key={id} className="item">
-                      <div
-                        className="icon"
-                        onClick={(event) => {
-                          handleDbClickINode(event, id);
-                        }}
-                      >
-                        {type === "DIR" ? (
-                          <IconContext.Provider
-                            value={{ className: "shared-class", size: 70 }}
-                          >
-                            <CiFolderOn />
-                          </IconContext.Provider>
-                        ) : (
-                          <IconContext.Provider
-                            value={{ className: "shared-class", size: 70 }}
-                          >
-                            <CiFileOn />
-                          </IconContext.Provider>
-                        )}
-                      </div>
 
-                      <div className="inode-name">{name}</div>
-                    </div>
+                  return (
+                    <Dropdown
+                      overlay={menu(id, type, name)}
+                      trigger={["contextMenu"]}
+                      key={id}
+                    >
+                      <div key={id} className="item">
+                        <div
+                          className="icon"
+                          onClick={(event) => {
+                            handleDbClickINode(event, id);
+                          }}
+                        >
+                          {type === "DIR" ? (
+                            <IconContext.Provider
+                              value={{ className: "shared-class", size: 70 }}
+                            >
+                              <CiFolderOn />
+                            </IconContext.Provider>
+                          ) : (
+                            <IconContext.Provider
+                              value={{ className: "shared-class", size: 70 }}
+                            >
+                              <CiFileOn />
+                            </IconContext.Provider>
+                          )}
+                        </div>
+
+                        <div className="inode-name">{name}</div>
+                      </div>
+                    </Dropdown>
                   );
                 })}
               </section>
             </section>
+            <div>
+              {isDeleteModalOpen && (
+                <DeleteModal
+                  id={selectedInodeId}
+                  type={selectedInodeType}
+                  name={selectedInodeName}
+                  isDeleteModalOpen={isDeleteModalOpen}
+                  setIsDeleteModalOpen={setIsDeleteModalOpen}
+                />
+              )}
+            </div>
           </div>
           <div className="col">
             <section>
-              <div style={{ border: "1px solid black", padding: "10px" }}>
+              <div
+                style={{
+                  height: 150,
+                  width: 400,
+                  border: "1px solid black",
+                  padding: "10px",
+                }}
+              >
                 <AddInodeForm />
               </div>
             </section>

@@ -95,6 +95,14 @@ const AppProvider = ({ children }) => {
       });
   };
 
+  const logoutUser = () => {
+    setIsLoggedin(false);
+    setCurrentUserEmail(null);
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
+    localStorage.removeItem("rootId");
+  };
+
   const fetchMeals = (allMealsUrl) => {
     setLoading(true);
     fetch(allMealsUrl)
@@ -185,7 +193,8 @@ const AppProvider = ({ children }) => {
         getSharedWithMe,
         currentUserEmail,
         setCurrentUserEmail,
-        currentParentId
+        currentParentId,
+        logoutUser,
       }}
     >
       {children}

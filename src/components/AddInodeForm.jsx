@@ -44,9 +44,9 @@ const AddInodeForm = () => {
       })
       .then(([status, body]) => {
         if (status == 200) {
+          //todo: message to user
           alert("inode added!");
           getChildren(currentParentId);
-          //navigate("/");
         } else {
           console.log(body.message);
         }

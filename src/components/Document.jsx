@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SERVER_ADDRESS } from "../constants";
@@ -12,16 +12,14 @@ const Document = () => {
   const [document, setDocument] = useState(null);
   const [stompClient, setStompClient] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const { currentUserEmail } = useGlobalContext();
   const [content, setContent] = useState([]);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [rawText, setRawText] = useState([]);
   const [prevCursorPosition, setPrevCursorPosition] = useState(0);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     if (null !== document) {
-      console.log("Document details:", document);
-      console.log(document.rawText);
       setRawText(document.rawText);
     }
   }, [document]);
@@ -47,7 +45,9 @@ const Document = () => {
   useEffect(() => {
     if (stompClient) {
       const onConnected = () => {
-        console.log("Subscribing to topics usersJoin and usersDiscommect of doc " + docId);
+        console.log(
+          "Subscribing to topics usersJoin and usersDiscommect of doc " + docId
+        );
         stompClient.subscribe(`/topic/usersJoin/${docId}`, onJoinEventReceived);
         stompClient.subscribe(
           `/topic/usersDisconnect/${docId}`,
@@ -75,7 +75,6 @@ const Document = () => {
         const updatedRawText = JSON.parse(event.body);
         console.log("WHAT RETURNED FROM SOCKET: ", updatedRawText);
         setRawText(updatedRawText);
-        setCursorPosition(prevCursorPosition + 1);
       };
 
       const userJoin = () => {
@@ -95,20 +94,6 @@ const Document = () => {
           JSON.stringify({ email: userEmail })
         );
       };
-
-      // const addToOnlineUsers = (user) => {
-      //   const alreadyOnline = onlineUsers.find((u) => u === user);
-      //   if (alreadyOnline) return;
-      //   const updatedOnlineUsers = [...onlineUsers, user];
-      //   setOnlineUsers(updatedOnlineUsers);
-      // };
-
-      // const removeFromOnlineUsers = (user) => {
-      //   const updatedOnlineUsers = onlineUsers.filter(
-      //     (onlineUser) => onlineUser !== user
-      //   );
-      //   setOnlineUsers(updatedOnlineUsers);
-      // };
 
       onConnected();
 
@@ -130,7 +115,7 @@ const Document = () => {
   };
 
   const loadDocument = (idNode) => {
-    console.log("loading document..." + idNode);
+    console.log(">>>>>>>>>>>loading document..." + idNode);
     console.log("Seding a get request to:" + SERVER_ADDRESS + "doc/" + idNode);
     fetch(SERVER_ADDRESS + "doc/" + idNode, {
       method: "GET",
@@ -147,7 +132,8 @@ const Document = () => {
         if (status == 200) {
           console.log(body);
           setDocument(body);
-          setRawText(body.rawText)
+          setRawText(body.rawText);
+          setCursorPosition(rawText.length);
         } else {
           alert(body.message);
         }
@@ -162,41 +148,60 @@ const Document = () => {
     setContent(rawText.map((charItem) => charItem.val));
   };
 
+  const handleArrowKeyDown = (arrowKeyType) => {
+
+    if (arrowKeyType === "ArrowLeft") {
+      if (cursorPosition <= 0) return;
+
+      setCursorPosition(cursorPosition - 1);
+    }
+
+    if (arrowKeyType === "ArrowRight") {
+      if (cursorPosition >= rawText.length) return;
+
+      setCursorPosition(cursorPosition + 1);
+    }
+  };
+
   useEffect(() => {
-    console.log("current raw text:", rawText);
-    console.log("$$$$$$$$$$$$$", rawText);
+    console.log("#####state of rawText:", rawText);
     convertRawTextToReadableText();
+    //update cursor position
+    setCursorPosition(cursorPosition + 1);
   }, [rawText]);
 
   useEffect(() => {
     console.log("%%%%%CURRENT DOC CONTENT%%%%%", content);
   }, [content]);
 
-  const handleContentChange = (event) => {
-    const newChar = event.nativeEvent.data;
+  const handleKeyDown = (event) => {
+    event.preventDefault();
+    let newChar = event.key;
     console.log("Char insertion: " + newChar);
 
-    const next = event.target.selectionStart - 1;
-    console.log("current position:" + next);
-    const prev =
-      next - 1 >= 0 ? next - 1 : null;
-    console.log("prev position:", prev);
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      handleArrowKeyDown(event.key);
+      return;
+    }
 
-    //const nextPosition = currentPosition + 1;
-    //console.log("next position:", nextPosition);
+    if (event.key === "Enter") newChar = 10; //ascii value for newline
+
+    const prev = cursorPosition - 1;
+    console.log("prev position:", prev);
+    const next = cursorPosition;
+    console.log("current position:" + next);
 
     console.log(rawText);
 
     const message = {
       p: rawText.length === 0 ? [] : rawText[prev].pos,
-      q: rawText.length === 0 || next >= rawText.length ? [] : rawText[next].pos,
+      q:
+        rawText.length === 0 || next >= rawText.length ? [] : rawText[next].pos,
       ch: newChar,
-      email: localStorage.getItem("email")
+      email: localStorage.getItem("email"),
     };
 
     console.log("Message To Socket:", message);
-    setPrevCursorPosition(prev);
-    console.log(prev);
     sendMessage(message);
   };
 
@@ -207,12 +212,13 @@ const Document = () => {
     setCursorPosition(selectionStart);
   };
 
-  const handleKeyUp = (event) => {
-    const textarea = event.target;
-    const { selectionStart } = textarea;
-
-    setCursorPosition(selectionStart);
-  };
+  useEffect(() => {
+    console.log("********************", cursorPosition);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    }
+  }, [cursorPosition]);
 
   return (
     <main className="container">
@@ -236,10 +242,10 @@ const Document = () => {
               </header>
               <main>
                 <textarea
+                  ref={textareaRef}
                   value={content.join("")}
-                  onChange={handleContentChange}
+                  onKeyDown={handleKeyDown}
                   onMouseMove={handleMouseMove}
-                  onKeyUp={handleKeyUp}
                 />
               </main>
               <p>Cursor Position: {cursorPosition}</p>

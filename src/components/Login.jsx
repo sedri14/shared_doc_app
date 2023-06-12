@@ -13,7 +13,7 @@ const Login = () => {
     password: "",
   });
 
-  const { setIsLoggedin, setCurrentUserEmail } = useGlobalContext();
+  const { isLoggedin, setIsLoggedin, setCurrentUserEmail } = useGlobalContext();
   const [passWordShown, setPasswordShown] = useState(false);
 
   const navigate = useNavigate();
@@ -41,6 +41,7 @@ const Login = () => {
         if (status == 200) {
           localStorage.setItem("token", body.token);
           setIsLoggedin(true);
+          setCurrentUserEmail(body.email);
           localStorage.setItem("email", body.email);
           localStorage.setItem("rootId", body.rootId);
           navigate("/");
