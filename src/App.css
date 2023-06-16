@@ -411,9 +411,8 @@ ul {
   font-size: 1.6em;
 }
 
-.inodes .item .icon,
-.inodes .item:hover .icon {
-  background: var(--white);
+.inodes .item:hover {
+  background: var(--shadow-4);
 }
 
 .inodes .item:focus .icon {
@@ -476,4 +475,8 @@ ul {
   resize: none;
   background-color: #f9f9f9;
   outline: none;
+}
+
+.share-modal .ant-modal-title {
+  font-size: 25px;
 }

@@ -31,6 +31,7 @@ const DeleteModal = ({
       headers: {
         "Content-Type": "application/json",
         token: localStorage.getItem("token"),
+        inodeId: id
       },
     })
       .then((response) => {

@@ -7,17 +7,12 @@ import { Button, Form, Input } from "antd";
 const registerURL = "auth/register";
 
 const Register = () => {
-  // const [formData, setFormData] = useState({
-  //   email: "",
-  //   name: "",
-  //   password: "",
-  // });
+
 
   const navigate = useNavigate();
 
   const onFinish = (values) => {
     console.log("Success:", values);
-    //setFormData({ ...formData, [values.name]: values.value });
     register(values);
   };
   const onFinishFailed = (errorInfo) => {

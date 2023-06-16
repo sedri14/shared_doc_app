@@ -4,8 +4,11 @@ import { useState, useEffect } from "react";
 import { SERVER_ADDRESS } from "../constants";
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
-import { useGlobalContext } from "../context";
 import OnlineUsers from "./OnlineUsers";
+import { ShareAltOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Button, Space } from "antd";
+import ShareModal from "./ShareModal";
+import { useGlobalContext } from "../context";
 
 const Document = () => {
   const { docId } = useParams();
@@ -15,8 +18,17 @@ const Document = () => {
   const [content, setContent] = useState([]);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [rawText, setRawText] = useState([]);
-  const [prevCursorPosition, setPrevCursorPosition] = useState(0);
   const textareaRef = useRef(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const { selectedInodeId } = useGlobalContext();
+
+  const showModal = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const handleShareClick = (key, type, id, name) => {
+    showModal();
+  };
 
   useEffect(() => {
     if (null !== document) {
@@ -116,12 +128,13 @@ const Document = () => {
 
   const loadDocument = (idNode) => {
     console.log(">>>>>>>>>>>loading document..." + idNode);
-    console.log("Seding a get request to:" + SERVER_ADDRESS + "doc/" + idNode);
+    console.log("Seding a get request to:" + SERVER_ADDRESS + "doc/getDoc" + idNode);
     fetch(SERVER_ADDRESS + "doc/" + idNode, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         token: localStorage.getItem("token"),
+        inodeId: idNode,
       },
     })
       .then((response) => {
@@ -149,7 +162,6 @@ const Document = () => {
   };
 
   const handleArrowKeyDown = (arrowKeyType) => {
-
     if (arrowKeyType === "ArrowLeft") {
       if (cursorPosition <= 0) return;
 
@@ -229,6 +241,14 @@ const Document = () => {
               {onlineUsers.length > 0 && (
                 <OnlineUsers onlineUsers={onlineUsers} />
               )}
+              {isShareModalOpen && (
+                <ShareModal
+                  id={selectedInodeId}
+                  title={document.name}
+                  isShareModalOpen={isShareModalOpen}
+                  setIsShareModalOpen={setIsShareModalOpen}
+                />
+              )}
               <header>
                 <small>id: {docId}</small>
                 <h1>{document.name}</h1>
@@ -238,6 +258,21 @@ const Document = () => {
                     <br />
                     Last edited on {document.lastEdited}
                   </p>
+                  <Space>
+                    <h4>{`Connected as: ${document.connectedUserRole}`}</h4>
+                  </Space>
+                  <Space wrap>
+                    <Button
+                      type="primary"
+                      icon={<ShareAltOutlined />}
+                      onClick={handleShareClick}
+                    >
+                      Share
+                    </Button>
+                    <Button type="primary" icon={<DownloadOutlined />}>
+                      Download
+                    </Button>
+                  </Space>
                 </div>
               </header>
               <main>

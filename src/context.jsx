@@ -23,9 +23,10 @@ const AppProvider = ({ children }) => {
   const [currentDocId, setCurrentDocId] = useState(null);
   const [document, setDocument] = useState(null);
   const [inodes, setInodes] = useState([]);
-  const [currentParentId, setCurrentParentId] = useState();
+  const [currentParentId, setCurrentParentId] = useState(null);
   const [selectedINode, setSelectedINode] = useState(null);
-  const [currentUserEmail, setCurrentUserEmail] = useState(null);
+  const [selectedInodeId, setSelectedInodeId] = useState(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState(localStorage.getItem("email"));
   const [isLoggedin, setIsLoggedin] = useState(
     localStorage.getItem("token") !== null
   );
@@ -40,6 +41,7 @@ const AppProvider = ({ children }) => {
       headers: {
         "Content-Type": "application/json",
         token: localStorage.getItem("token"),
+        inodeId: inodeId,
       },
     })
       .then((response) => {
@@ -53,9 +55,8 @@ const AppProvider = ({ children }) => {
           } else {
             setInodes([]);
           }
-          setCurrentParentId(inodeId);
         } else {
-          alert(body.message);
+          console.log(body.message);
         }
       })
       .catch((error) => {
@@ -187,6 +188,8 @@ const AppProvider = ({ children }) => {
         inodes,
         selectedINode,
         setSelectedINode,
+        selectedInodeId,
+        setSelectedInodeId,
         currentDocId,
         setCurrentDocId,
         document,
@@ -194,6 +197,7 @@ const AppProvider = ({ children }) => {
         currentUserEmail,
         setCurrentUserEmail,
         currentParentId,
+        setCurrentParentId,
         logoutUser,
       }}
     >

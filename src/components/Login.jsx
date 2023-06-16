@@ -13,7 +13,7 @@ const Login = () => {
     password: "",
   });
 
-  const { isLoggedin, setIsLoggedin, setCurrentUserEmail } = useGlobalContext();
+  const { setIsLoggedin, setCurrentUserEmail, setCurrentParentId } = useGlobalContext();
   const [passWordShown, setPasswordShown] = useState(false);
 
   const navigate = useNavigate();
@@ -44,6 +44,7 @@ const Login = () => {
           setCurrentUserEmail(body.email);
           localStorage.setItem("email", body.email);
           localStorage.setItem("rootId", body.rootId);
+          setCurrentParentId(body.rootId);
           navigate("/");
         } else {
           console.log(body.message);

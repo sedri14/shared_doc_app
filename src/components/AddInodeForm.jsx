@@ -44,7 +44,6 @@ const AddInodeForm = () => {
       })
       .then(([status, body]) => {
         if (status == 200) {
-          //todo: message to user
           alert("inode added!");
           getChildren(currentParentId);
         } else {
@@ -62,7 +61,7 @@ const AddInodeForm = () => {
     console.log("Name:", name);
 
     const messageBody = {
-      parentId: localStorage.getItem("rootId"),
+      parentId: currentParentId,
       name: name,
       type: type,
     };

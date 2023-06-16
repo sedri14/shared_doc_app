@@ -1,7 +1,5 @@
 import "./App.css";
-import Favorites from "./components/Favorites";
-import Meals from "./components/Meals";
-import Modal from "./components/Modal";
+import { useEffect } from "react";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import HomePage from "./components/HomePage";
@@ -10,11 +8,16 @@ import Document from "./components/Document";
 import SharedWithMe from "./components/SharedWithMe";
 import Nav from "./components/Nav";
 import NotFound from "./components/NotFound";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { useGlobalContext } from "./context";
 
 function App() {
-  const { showModal, favorites } = useGlobalContext();
+  const { setCurrentParentId } = useGlobalContext();
+
   return (
     <div>
       <Router>
@@ -28,9 +31,6 @@ function App() {
             element={
               <div>
                 <Login />
-                {/* {favorites.length > 0 && <Favorites />}
-                <Meals />
-                {showModal && <Modal />} */}
               </div>
             }
           ></Route>

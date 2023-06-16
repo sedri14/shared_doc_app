@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useGlobalContext } from "../context";
-import { CiFolderOn, CiFileOn } from "react-icons/ci";
+import { FolderTwoTone, FileTwoTone } from "@ant-design/icons";
 import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
 import AddInodeForm from "./AddInodeForm";
@@ -19,13 +19,14 @@ const HomePage = () => {
     inodes,
     selectedINode,
     setSelectedINode,
-    currentDocId,
-    setCurrentDocId,
+    selectedInodeId,
+    setSelectedInodeId,
+    currentParentId,
+    setCurrentParentId,
     loadDocument,
   } = useGlobalContext();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedInodeId, setSelectedInodeId] = useState(null);
   const [selectedInodeType, setSelectedInodeType] = useState("");
   const [selectedInodeName, setSelectedInodeName] = useState("");
 
@@ -34,8 +35,14 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-   console.log("show modal changed boolean");
+    console.log("show modal changed boolean");
   }, [isDeleteModalOpen]);
+
+  useEffect(() => {
+    getChildren(currentParentId);
+  }, [currentParentId]);
+
+  useEffect(() => {}, [inodes]);
 
   const menu = (id, type, name) => (
     <Menu
@@ -64,22 +71,11 @@ const HomePage = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log("Doc id has changed to: " + currentDocId);
-  //   if (currentDocId) {
-  //     loadDocument(currentDocId);
-  //     navigate(`doc/${currentDocId}`);
-  //   }
-  // }, [currentDocId]);
-
   useEffect(() => {
     if (isLoggedin) {
       getChildren(localStorage.getItem("rootId"));
-      //say hello user!
     }
   }, [isLoggedin]);
-
-  useEffect(() => {}, [inodes]);
 
   const handleDbClickINode = (event, idNode) => {
     if (event.detail === 2) {
@@ -94,12 +90,12 @@ const HomePage = () => {
       );
       //console.log(inode);
       setSelectedINode(inode);
+      setSelectedInodeId(inode.id);
       if (inode.type === "FILE") {
-        //TODO: replace url to doc/:docId by cnhanging the currentDocId.
-        setCurrentDocId(inode.id);
         navigate(docLoadURL + `${inode.id}`);
       } else {
-        //open dir
+        //inode.type === "DIR"
+        setCurrentParentId(inode.id);
       }
     }
   };
@@ -114,7 +110,7 @@ const HomePage = () => {
                 Selected inode:
                 {selectedINode !== null ? selectedINode.name : "not selected"}
               </h5>
-              <h5>User connected</h5>
+              <h5>Current parent id: {currentParentId}</h5>
 
               <h1>Your Drive</h1>
               <section className="inodes">
@@ -138,13 +134,13 @@ const HomePage = () => {
                             <IconContext.Provider
                               value={{ className: "shared-class", size: 70 }}
                             >
-                              <CiFolderOn />
+                              <FolderTwoTone twoToneColor="#36a326" />{" "}
                             </IconContext.Provider>
                           ) : (
                             <IconContext.Provider
                               value={{ className: "shared-class", size: 70 }}
                             >
-                              <CiFileOn />
+                              <FileTwoTone twoToneColor="#4d2cc7" />{" "}
                             </IconContext.Provider>
                           )}
                         </div>
