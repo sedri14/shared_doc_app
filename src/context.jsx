@@ -7,6 +7,7 @@ const allMealsUrl = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
 const randomMealUrl = "https://www.themealdb.com/api/json/v1/1/random.php";
 const getChildrenURL = "fs/level/";
 const getSharedWithMeURL = "fs/shared-with-me";
+const testURL = "fs/myCats";
 
 const AppProvider = ({ children }) => {
   //Meals app
@@ -26,10 +27,43 @@ const AppProvider = ({ children }) => {
   const [currentParentId, setCurrentParentId] = useState(null);
   const [selectedINode, setSelectedINode] = useState(null);
   const [selectedInodeId, setSelectedInodeId] = useState(null);
-  const [currentUserEmail, setCurrentUserEmail] = useState(localStorage.getItem("email"));
+  const [currentUserEmail, setCurrentUserEmail] = useState(
+    localStorage.getItem("email")
+  );
   const [isLoggedin, setIsLoggedin] = useState(
     localStorage.getItem("token") !== null
   );
+
+  const [cats, setCats] = useState([]);
+
+  const myCats = () => {
+    console.log("Seding a post request to:" + SERVER_ADDRESS + testURL);
+    fetch(SERVER_ADDRESS + testURL, {
+      method: "GET",
+      headers: {
+        token: localStorage.getItem("token"),
+        inodeId: 2,
+      },
+    })
+      .then((response) => {
+        console.log("status" + response.status);
+        return Promise.all([response.status, response.json()]);
+      })
+      .then(([status, body]) => {
+        if (status == 200) {
+          if (body) {
+            setCats(body);
+          } else {
+            setCats([]);
+          }
+        } else {
+          console.log(body.message);
+        }
+      })
+      .catch((error) => {
+        console.error(`ERROR: ${error}`);
+      });
+  };
 
   const getChildren = (inodeId) => {
     console.log("Get children nodes...");
@@ -199,6 +233,8 @@ const AppProvider = ({ children }) => {
         currentParentId,
         setCurrentParentId,
         logoutUser,
+        cats,
+        myCats,
       }}
     >
       {children}

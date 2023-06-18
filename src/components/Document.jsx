@@ -10,6 +10,8 @@ import { Button, Space } from "antd";
 import ShareModal from "./ShareModal";
 import { useGlobalContext } from "../context";
 
+const getDocURL = "doc/getDoc/";
+
 const Document = () => {
   const { docId } = useParams();
   const [document, setDocument] = useState(null);
@@ -20,6 +22,7 @@ const Document = () => {
   const [rawText, setRawText] = useState([]);
   const textareaRef = useRef(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [connectedUserRole, setConnectedUserRole] = useState(null);
   const { selectedInodeId } = useGlobalContext();
 
   const showModal = () => {
@@ -128,8 +131,10 @@ const Document = () => {
 
   const loadDocument = (idNode) => {
     console.log(">>>>>>>>>>>loading document..." + idNode);
-    console.log("Seding a get request to:" + SERVER_ADDRESS + "doc/getDoc" + idNode);
-    fetch(SERVER_ADDRESS + "doc/" + idNode, {
+    console.log(
+      "Seding a get request to:" + SERVER_ADDRESS + getDocURL + idNode
+    );
+    fetch(SERVER_ADDRESS + getDocURL + idNode, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -147,6 +152,7 @@ const Document = () => {
           setDocument(body);
           setRawText(body.rawText);
           setCursorPosition(rawText.length);
+          setConnectedUserRole(body.userRole);
         } else {
           alert(body.message);
         }
@@ -258,17 +264,20 @@ const Document = () => {
                     <br />
                     Last edited on {document.lastEdited}
                   </p>
-                  <Space>
-                    <h4>{`Connected as: ${document.connectedUserRole}`}</h4>
+                  <Space wrap>
+                    <h4>{`Connected as: ${connectedUserRole}`}</h4>
                   </Space>
                   <Space wrap>
-                    <Button
-                      type="primary"
-                      icon={<ShareAltOutlined />}
-                      onClick={handleShareClick}
-                    >
-                      Share
-                    </Button>
+                    {connectedUserRole === "OWNER" && (
+                      <Button
+                        type="primary"
+                        icon={<ShareAltOutlined />}
+                        onClick={handleShareClick}
+                      >
+                        Share
+                      </Button>
+                    )}
+
                     <Button type="primary" icon={<DownloadOutlined />}>
                       Download
                     </Button>
@@ -281,6 +290,7 @@ const Document = () => {
                   value={content.join("")}
                   onKeyDown={handleKeyDown}
                   onMouseMove={handleMouseMove}
+                  disabled={connectedUserRole === "VIEWER"}
                 />
               </main>
               <p>Cursor Position: {cursorPosition}</p>

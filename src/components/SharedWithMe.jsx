@@ -13,21 +13,11 @@ const SharedWithMe = () => {
     inodes,
     selectedINode,
     setSelectedINode,
-    currentDocId,
     setCurrentDocId,
-    loadDocument,
     getSharedWithMe,
   } = useGlobalContext();
 
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   console.log("Doc id has changed to: " + currentDocId);
-  //   if (currentDocId) {
-  //     loadDocument(currentDocId);
-  //     navigate(`doc/${currentDocId}`);
-  //   }
-  // }, [currentDocId]);
 
   useEffect(() => {
     if (isLoggedin) {

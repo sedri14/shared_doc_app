@@ -23,7 +23,8 @@ const HomePage = () => {
     setSelectedInodeId,
     currentParentId,
     setCurrentParentId,
-    loadDocument,
+    cats,
+    myCats,
   } = useGlobalContext();
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -74,8 +75,9 @@ const HomePage = () => {
   useEffect(() => {
     if (isLoggedin) {
       getChildren(localStorage.getItem("rootId"));
+      myCats();
     }
-  }, [isLoggedin]);
+  }, []);
 
   const handleDbClickINode = (event, idNode) => {
     if (event.detail === 2) {
@@ -178,6 +180,12 @@ const HomePage = () => {
               </div>
             </section>
           </div>
+        </div>
+
+        <div className="cats">
+          {cats.map((cat, index) => (
+            <div key={index}>{cat}</div>
+          ))}
         </div>
       </div>
     );
