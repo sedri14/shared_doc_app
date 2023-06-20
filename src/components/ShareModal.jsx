@@ -18,7 +18,6 @@ const getDocumentRolesURL = "doc/roles/";
 const ColorList = ["#f56a00", "#7265e6", "#ffbf00", "#00a2ae"];
 
 const ShareModal = ({ id, title, isShareModalOpen, setIsShareModalOpen }) => {
-  const { getChildren, currentParentId } = useGlobalContext();
   const [permissions, setPermissions] = useState([]);
   const [color, setColor] = useState(ColorList[0]);
   const [modalTitle, setModaltitle] = useState(`Share '${title}'`);

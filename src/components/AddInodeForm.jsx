@@ -6,11 +6,7 @@ import { useGlobalContext } from "../context";
 const addInodeURL = "fs/add";
 
 const AddInodeForm = () => {
-  const {
-    getChildren,
-    currentParentId
-
-  } = useGlobalContext();
+  const { getChildren, currentFolder } = useGlobalContext();
   const [type, setType] = useState("FILE");
   const [name, setName] = useState("");
 
@@ -45,7 +41,7 @@ const AddInodeForm = () => {
       .then(([status, body]) => {
         if (status == 200) {
           alert("inode added!");
-          getChildren(currentParentId);
+          getChildren(currentFolder.id);
         } else {
           console.log(body.message);
         }
@@ -61,7 +57,7 @@ const AddInodeForm = () => {
     console.log("Name:", name);
 
     const messageBody = {
-      parentId: currentParentId,
+      parentId: currentFolder.id,
       name: name,
       type: type,
     };

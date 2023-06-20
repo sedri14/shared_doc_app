@@ -13,7 +13,8 @@ const Login = () => {
     password: "",
   });
 
-  const { setIsLoggedin, setCurrentUserEmail, setCurrentParentId } = useGlobalContext();
+  const { setIsLoggedin, setCurrentUserEmail, setCurrentFolder } =
+    useGlobalContext();
   const [passWordShown, setPasswordShown] = useState(false);
 
   const navigate = useNavigate();
@@ -39,13 +40,14 @@ const Login = () => {
       })
       .then(([status, body]) => {
         if (status == 200) {
+          localStorage.clear();
           localStorage.setItem("token", body.token);
           setIsLoggedin(true);
           setCurrentUserEmail(body.email);
           localStorage.setItem("email", body.email);
           localStorage.setItem("rootId", body.rootId);
-          setCurrentParentId(body.rootId);
-          navigate("/");
+          setCurrentFolder({ id: body.rootId });
+          navigate("/dashboard");
         } else {
           console.log(body.message);
         }

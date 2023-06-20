@@ -11,8 +11,6 @@ const SharedWithMe = () => {
   const {
     isLoggedin,
     inodes,
-    selectedINode,
-    setSelectedINode,
     setCurrentDocId,
     getSharedWithMe,
   } = useGlobalContext();
@@ -37,7 +35,7 @@ const SharedWithMe = () => {
           inode.name
       );
       //console.log(inode);
-      setSelectedINode(inode);
+      
       if (inode.type === "FILE") {
         setCurrentDocId(inode.id);
         console.log("navigating to: " + docLoadURL + `${inode.id}`);
@@ -51,10 +49,6 @@ const SharedWithMe = () => {
   if (isLoggedin) {
     return (
       <section className="section">
-        <h5>
-          Selected inode:
-          {selectedINode !== null ? selectedINode.name : "not selected"}
-        </h5>
         <h5>User connected</h5>
 
         <h1>Shared With You</h1>

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useGlobalContext } from "../context";
+import { useGlobalContext } from "../../context";
 import { FolderTwoTone, FileTwoTone } from "@ant-design/icons";
 import { IconContext } from "react-icons";
 import { useNavigate } from "react-router-dom";
-import AddInodeForm from "./AddInodeForm";
-import { Dropdown, Menu, Modal, Button } from "antd";
+import AddInodeForm from "../AddInodeForm";
+import { Dropdown, Menu } from "antd";
 import { DeleteOutlined } from "@ant-design/icons/lib/icons";
-import DeleteModal from "./DeleteModal";
-import { SERVER_ADDRESS } from "../constants";
+import DeleteModal from "../DeleteModal";
 
 const docLoadURL = "doc/";
 
@@ -21,8 +20,10 @@ const HomePage = () => {
     setSelectedINode,
     selectedInodeId,
     setSelectedInodeId,
-    currentParentId,
-    setCurrentParentId,
+    // currentParentId,
+    // setCurrentParentId,
+    currentFolder,
+    setCurrentFolder,
     cats,
     myCats,
   } = useGlobalContext();
@@ -40,8 +41,9 @@ const HomePage = () => {
   }, [isDeleteModalOpen]);
 
   useEffect(() => {
-    getChildren(currentParentId);
-  }, [currentParentId]);
+    console.log(currentFolder);
+    getChildren(currentFolder);
+  }, [currentFolder]);
 
   useEffect(() => {}, [inodes]);
 
@@ -97,7 +99,7 @@ const HomePage = () => {
         navigate(docLoadURL + `${inode.id}`);
       } else {
         //inode.type === "DIR"
-        setCurrentParentId(inode.id);
+        setCurrentFolder(inode);
       }
     }
   };
@@ -112,7 +114,11 @@ const HomePage = () => {
                 Selected inode:
                 {selectedINode !== null ? selectedINode.name : "not selected"}
               </h5>
-              <h5>Current parent id: {currentParentId}</h5>
+              {currentFolder && (
+                <h5>
+                  Current folder is: {currentFolder.id} {currentFolder.name}
+                </h5>
+              )}
 
               <h1>Your Drive</h1>
               <section className="inodes">

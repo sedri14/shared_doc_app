@@ -11,7 +11,7 @@ const DeleteModal = ({
   isDeleteModalOpen,
   setIsDeleteModalOpen,
 }) => {
-  const { getChildren, currentParentId } = useGlobalContext();
+  const { getChildren, currentFolder } = useGlobalContext();
 
   const handleOk = () => {
     deleteInodeRequest(id);
@@ -42,7 +42,7 @@ const DeleteModal = ({
         if (status == 200) {
             
           console.log("inode deleted!");
-          getChildren(currentParentId);
+          getChildren(currentFolder.id);
         } else {
           console.log(body.message);
         }

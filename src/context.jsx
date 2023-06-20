@@ -24,7 +24,8 @@ const AppProvider = ({ children }) => {
   const [currentDocId, setCurrentDocId] = useState(null);
   const [document, setDocument] = useState(null);
   const [inodes, setInodes] = useState([]);
-  const [currentParentId, setCurrentParentId] = useState(null);
+  const [currentFolder, setCurrentFolder] = useState(null);
+  const [path, setPath] = useState([]);
   const [selectedINode, setSelectedINode] = useState(null);
   const [selectedInodeId, setSelectedInodeId] = useState(null);
   const [currentUserEmail, setCurrentUserEmail] = useState(
@@ -65,6 +66,10 @@ const AppProvider = ({ children }) => {
       });
   };
 
+  useEffect(() => {
+    console.log("current folder: ", currentFolder);
+  }, [currentFolder]);
+
   const getChildren = (inodeId) => {
     console.log("Get children nodes...");
     console.log(
@@ -85,7 +90,8 @@ const AppProvider = ({ children }) => {
       .then(([status, body]) => {
         if (status == 200) {
           if (body) {
-            setInodes(body);
+            setPath(body.path);
+            setInodes(body.children);
           } else {
             setInodes([]);
           }
@@ -230,11 +236,13 @@ const AppProvider = ({ children }) => {
         getSharedWithMe,
         currentUserEmail,
         setCurrentUserEmail,
-        currentParentId,
-        setCurrentParentId,
         logoutUser,
         cats,
         myCats,
+        path,
+        setPath,
+        currentFolder,
+        setCurrentFolder,
       }}
     >
       {children}

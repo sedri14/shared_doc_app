@@ -17,6 +17,11 @@ const Nav = () => {
             Home
           </Link>
         </li>
+        <li className="nav-item">
+          <Link className="nav-link" to="/dashboard">
+            Dashboard
+          </Link>
+        </li>
 
         {isLoggedin ? (
           <li className="nav-item">
